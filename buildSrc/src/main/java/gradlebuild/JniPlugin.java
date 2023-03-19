@@ -59,6 +59,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static gradlebuild.NativeRulesUtils.addPlatform;
+import static gradlebuild.NativeRulesUtils.addToolchain;
 
 @SuppressWarnings("UnstableApiUsage")
 public abstract class JniPlugin implements Plugin<Project> {
@@ -262,19 +263,19 @@ public abstract class JniPlugin implements Plugin<Project> {
         }
 
         @Mutate void createToolChains(NativeToolChainRegistry toolChainRegistry) {
-            toolChainRegistry.create("gcc", Gcc.class, toolChain -> {
+            addToolchain(toolChainRegistry, "gcc", Gcc.class, toolChain -> {
                 // The core Gradle toolchain for gcc only targets x86 and x86_64 out of the box.
                 // https://github.com/gradle/gradle/blob/36614ee523e5906ddfa1fed9a5dc00a5addac1b0/subprojects/platform-native/src/main/java/org/gradle/nativeplatform/toolchain/internal/gcc/AbstractGccCompatibleToolChain.java
                 toolChain.target("linux_aarch64");
             });
-            toolChainRegistry.create("clang", Clang.class, toolChain -> {
+            addToolchain(toolChainRegistry, "clang", Clang.class, toolChain -> {
                 // The core Gradle toolchain for Clang only targets x86 and x86_64 out of the box.
                 OperatingSystem os = new DefaultNativePlatform("current").getOperatingSystem();
                 if (os.isMacOsX()) {
                     toolChain.target("osx_aarch64");
                 }
             });
-            toolChainRegistry.create("visualCpp", VisualCpp.class);
+            addToolchain(toolChainRegistry, "visualCpp", VisualCpp.class, toolchain -> {});
         }
 
         @Mutate
